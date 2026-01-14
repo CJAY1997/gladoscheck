@@ -146,10 +146,12 @@ def main():
 
         res = g.checkin()
         msg = res.get("message", "Unknown")
+        points = res.get("points")  # 新增
+
 
         if res.get("code") == 0:
-            print("✅ 签到成功：", msg)
-            results.append((name, "成功", msg))
+            print(f"✅ 签到成功：{msg}，获得点数：{points}")
+            results.append((name, "成功", f"{msg} (点数: {points})"))
         elif "repeat" in msg.lower():
             print("ℹ️ 今日已签到：", msg)
             results.append((name, "已签到", msg))
