@@ -167,7 +167,7 @@ def main():
 
         time.sleep(2)
 
-    ok = sum(1 for _, st, _ in results if st == "成功")
+    ok = sum(1 for _, st, *_ in results if st == "成功")
     total = len(results)
     now_sgt = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S (SGT)")
 
