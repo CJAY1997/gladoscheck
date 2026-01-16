@@ -32,6 +32,16 @@ def load_accounts_from_secret_env() -> list[dict]:
 
     return accounts
 
+def format_traffic(traffic):
+    if traffic is None:
+        return "未知"
+    gb = traffic / (1024**3)
+    mb = traffic / (1024**2)
+    if gb >= 1:
+        return f"{gb:.2f} GB"
+    else:
+        return f"{mb:.2f} MB"
+
 def notify_telegram(title: str, text: str) -> bool:
     token = os.getenv("TG_BOT_TOKEN")
     chat_id = os.getenv("TG_CHAT_ID")
@@ -148,7 +158,7 @@ def main():
         print(f"  邮箱: {st['email']}")
         print(f"  VIP等级: {st['vip']}")
         print(f"  剩余天数: {st['leftDays']}")
-        print(f"  已用流量: {st.get('traffic', 0)}")
+        print(f"  已用流量: {format_traffic(st.get('traffic'))}")
         print(f"  Cake数: {st.get('cakeCount', 0)}")
 
         res = g.checkin()
@@ -167,7 +177,7 @@ def main():
 
         time.sleep(2)
 
-    ok = sum(1 for _, st, *_ in results if st == "成功")
+    ok = sum(1 for _, st, *_ in results if st in ("成功", "已签到"))
     total = len(results)
     now_sgt = datetime.now(timezone(timedelta(hours=8))).strftime("%Y-%m-%d %H:%M:%S (SGT)")
 
@@ -179,7 +189,7 @@ def main():
             report += f" (今日点数: {points_today})"
         report += f" (剩余天数: {leftDays})"
         if traffic is not None:
-            report += f" (已用流量: {traffic})"
+            report += f" (已用流量: {format_traffic(traffic)})"
         report += "\n"
 
     print("\n--- 汇总 ---\n" + report)
