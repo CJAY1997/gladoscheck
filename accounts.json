@@ -1,0 +1,12 @@
+[
+  {
+    "name": "账号1",
+    "koa_sess": "",
+    "koa_sess_sig": ""
+  },
+  {
+    "name": "账号2",
+    "koa_sess": "",
+    "koa_sess_sig": ""
+  }
+]
