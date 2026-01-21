@@ -2,6 +2,8 @@
 
 GLaDOS 网络自动签到脚本，支持多账号和微信推送通知。
 
+支持GithubAction和本地运行,GithubAction就用下面的环境变量,本地运行把cookie填入accounts.json中,脚本会自适应执行,优先环境变量
+
 ## 功能特性
 
 - 🚀 自动每日签到
