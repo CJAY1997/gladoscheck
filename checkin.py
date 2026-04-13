@@ -53,9 +53,15 @@ def load_accounts():
 def format_traffic(traffic):
     if traffic is None:
         return "未知"
-    gb = traffic / (1024**3)
-    mb = traffic / (1024**2)
-    return f"{gb:.2f} GB" if gb >= 1 else f"{mb:.2f} MB"
+    # 按照从大到小的顺序判断
+    if traffic >= 1024 ** 3:
+        return f"{traffic / (1024 ** 3):.2f} GB"
+    elif traffic >= 1024 ** 2:
+        return f"{traffic / (1024 ** 2):.2f} MB"
+    elif traffic >= 1024:
+        return f"{traffic / 1024:.2f} KB"
+    else:
+        return f"{traffic} B"
 
 def notify_telegram(title: str, text: str) -> bool:
     token = os.getenv("TG_BOT_TOKEN")
