@@ -1,3 +1,7 @@
+# 本地真实 Cookie 配置文件（绝对不提交到远程仓库）
+accounts.json
+accounts.local.json
+
 # Python
 __pycache__/
 *.py[cod]
@@ -21,30 +25,11 @@ wheels/
 *.egg
 MANIFEST
 
-# PyInstaller
-*.manifest
-*.spec
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-.pytest_cache/
-
 # Environments
 .env
 .venv
 env/
 venv/
-ENV/
-env.bak/
-venv.bak/
 
 # IDE
 .vscode/
@@ -58,7 +43,3 @@ venv.bak/
 # OS
 .DS_Store
 Thumbs.db
-
-# Config files
-config.json
-cookies.json

@@ -2,33 +2,33 @@ name: GLaDOS Checkin
 
 on:
   schedule:
-    - cron: "0 0 * * *"   # UTC 00:00 = 北京时间 08:00
-  workflow_dispatch:
+    # 每天北京时间上午 08:30 (UTC 00:30) 自动执行
+    - cron: '30 0 * * *'
+  workflow_dispatch: # 支持在 GitHub 页面上手动点击测试
 
 jobs:
   checkin:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: '3.11'
+          cache: 'pip'
 
-      - name: Install deps
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run checkin
+      - name: Run GLaDOS Checkin
         env:
-          GLaDOS_COOKIES_JSON: ${{ secrets.GLaDOS_COOKIES_JSON }}
-          # 可选：Telegram
+          GLaDOS_COOKIES_JSON: ${{ secrets.GLADOS_COOKIES_JSON || secrets.GLaDOS_COOKIES_JSON }}
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_CHAT_ID: ${{ secrets.TG_CHAT_ID }}
-          # 可选：Server酱
           SERVERCHAN_KEY: ${{ secrets.SERVERCHAN_KEY }}
         run: |
           python checkin.py
