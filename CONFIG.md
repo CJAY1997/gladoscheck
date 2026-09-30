@@ -1,107 +1,106 @@
-# 配置说明
+# 详细配置说明
+
+由于 GLaDOS 官方安全升级，目前每次请求必须携带 **4 个 Cookie 字段** 才能通过身份验证。
+
+---
 
 ## 1. Cookies 获取方法
 
-### 方法一：浏览器开发者工具
-1. 打开浏览器，访问 https://glados.network/console
-2. 登录你的账号
-3. 按 F12 打开开发者工具
-4. 切换到 "Network"（网络）标签页
-5. 刷新页面或点击任意按钮
-6. 在请求列表中选择任意一个请求
-7. 在右侧的 "Headers"（请求头）中找到 "Cookie" 字段
-8. 复制其中的 `koa:sess` 和 `koa:sess.sig` 的值
+### 方法一：开发者工具 Application 面板（最直观）
+1. 打开浏览器并登录 [GLaDOS 控制台](https://glados.cloud/console/checkin)。
+2. 按 `F12` 打开开发者工具。
+3. 点击顶部的 **应用 (Application)** 标签页（如未显示，可点击 `>>` 展开）。
+4. 在左侧面板展开 **存储 (Storage)** -> **Cookie** -> 点击 `https://glados.cloud`。
+5. 在右侧列表中找到以下 **4 个名称**，分别点击并复制其值：
+   - `gld:sess`
+   - `gld:sess.sig`
+   - `koa:sess`
+   - `koa:sess.sig`
 
-### 方法二：浏览器控制台
-1. 登录 GLaDOS 后，按 F12 打开开发者工具
-2. 切换到 "Console"（控制台）标签页
-3. 输入以下代码并回车：
-```javascript
-document.cookie.split(';').filter(c => c.includes('koa:sess'))
-```
-4. 从输出结果中提取 `koa:sess` 和 `koa:sess.sig` 的值
+### 方法二：开发者工具 Network 面板（最快捷）
+1. 打开开发者工具并切换到 **网络 (Network)** 标签页。
+2. 刷新页面，在列表中点击任意以 `status` 或 `checkin` 结尾的请求。
+3. 在右侧 **标头 (Headers)** -> **请求标头 (Request Headers)** 中找到 **`cookie:`**。
+4. 复制整行 Cookie 内容，可直接作为 `"cookie": "..."` 填入配置。
+
+---
 
 ## 2. GitHub Secrets 配置
 
-在 GitHub 仓库中设置以下 Secrets：
+在 GitHub 仓库中点击 `Settings` -> `Secrets and variables` -> `Actions`。
 
-### COOKIES（必需）
-格式为 JSON 字符串，支持多账号：
+### `GLADOS_COOKIES_JSON`（必需）
+
+格式为 JSON 数组，支持任意数量的多账号：
+
+#### 格式 A：标准 4 字段格式（推荐）
 ```json
 [
   {
-    "name": "主账号",
-    "koa_sess": "你的koa:sess值",
-    "koa_sess_sig": "你的koa:sess.sig值"
+    "name": "账号1",
+    "gld_sess": "你的 gld:sess",
+    "gld_sess_sig": "你的 gld:sess.sig",
+    "koa_sess": "你的 koa:sess",
+    "koa_sess_sig": "你的 koa:sess.sig"
   },
   {
-    "name": "副账号",
-    "koa_sess": "另一个koa:sess值", 
-    "koa_sess_sig": "另一个koa:sess.sig值"
+    "name": "账号2",
+    "gld_sess": "账号2的 gld:sess",
+    "gld_sess_sig": "账号2的 gld:sess.sig",
+    "koa_sess": "账号2的 koa:sess",
+    "koa_sess_sig": "账号2的 koa:sess.sig"
   }
 ]
 ```
 
-### SERVERCHAN_KEY（可选）
-用于微信推送通知的 Server酱 Key。
-
-获取方法：
-1. 访问 https://sct.ftqq.com/
-2. 微信扫码登录
-3. 点击"发送消息"，获取 SendKey
-4. 将 SendKey 设置为 SERVERCHAN_KEY 的值
-
-## 3. 本地测试
-
-### 安装依赖
-```bash
-pip install -r requirements.txt
+#### 格式 B：整串 Cookie 格式
+```json
+[
+  {
+    "name": "账号1",
+    "cookie": "gld:sess=...; gld:sess.sig=...; koa:sess=...; koa:sess.sig=..."
+  }
+]
 ```
 
-### 创建本地配置
-复制 `cookies.example.json` 为 `cookies.json`，并填入你的真实 cookies 信息：
-```bash
-cp cookies.example.json cookies.json
-```
+---
 
-### 运行测试
-```bash
-python test_local.py
-```
+## 3. 推送通知配置（可选）
 
-## 4. 运行时间配置
+### Telegram 推送
+- `TG_BOT_TOKEN`：在 Telegram 中与 `@BotFather` 对话创建机器人后获取的 HTTP API Token。
+- `TG_CHAT_ID`：你的 Telegram 用户 ID 或群组 ID（可通过 `@userinfobot` 获取）。
 
-默认每天北京时间 9:00 AM 运行。如需修改，编辑 `.github/workflows/checkin.yml` 文件中的 cron 表达式：
+### 微信推送（Server酱）
+- `SERVERCHAN_KEY`：Server酱 SendKey。
+  1. 访问 https://sct.ftqq.com/ 微信扫码登录。
+  2. 点击“发送消息”获取 SendKey。
+  3. 设置为 `SERVERCHAN_KEY`。
 
-```yaml
-schedule:
-  # 0 1 * * * 表示每天 UTC 1:00（北京时间 9:00）
-  - cron: '0 1 * * *'
-```
+---
 
-常用时间对照：
-- 北京时间 8:00  → UTC 0:00  → `'0 0 * * *'`
-- 北京时间 9:00  → UTC 1:00  → `'0 1 * * *'`
-- 北京时间 10:00 → UTC 2:00  → `'0 2 * * *'`
-- 北京时间 12:00 → UTC 4:00  → `'0 4 * * *'`
-- 北京时间 20:00 → UTC 12:00 → `'0 12 * * *'`
+## 4. 本地安全测试与运行
 
-## 5. 常见问题
+为了避免本地提交代码时不慎将真实 Cookie 上传到 GitHub，本地采用安全文件分离机制：
 
-### Q: 签到失败，提示 cookies 过期
-A: 重新获取 cookies 并更新 GitHub Secrets 中的 COOKIES 配置
-
-### Q: 微信通知没有收到
-A: 检查 SERVERCHAN_KEY 是否正确配置，并确保 Server酱 服务正常
-
-### Q: GitHub Actions 没有自动运行
-A: 检查是否启用了 Actions，并确保仓库不是 fork 的私有仓库
-
-### Q: 如何查看运行日志
-A: 在 GitHub 仓库的 Actions 页面可以查看详细的运行日志
-
-## 6. 安全提醒
-
-- 不要在公开场所分享你的 cookies 信息
-- 定期更新 cookies（建议每月更新一次）
-- 如果发现异常登录，立即修改密码并重新获取 cookies
+1. 安装依赖：
+   ```bash
+   pip install -r requirements.txt
+   ```
+2. 在本地创建 `accounts.local.json`（该文件已写入 `.gitignore`，不会被 Git 提交）：
+   ```json
+   [
+     {
+       "name": "账号1",
+       "gld_sess": "...",
+       "gld_sess_sig": "...",
+       "koa_sess": "...",
+       "koa_sess_sig": "..."
+     }
+   ]
+   ```
+3. 执行测试：
+   ```bash
+   python checkin.py
+   ```
+   程序会自动优先读取 `accounts.local.json`，确保本地测试正常且绝不泄露凭据。
