@@ -55,8 +55,9 @@ def load_accounts():
     for idx, a in enumerate(accounts, 1):
         if not isinstance(a, dict):
             raise RuntimeError(f"Account #{idx} must be an object")
+        # name 字段可选，未提供时自动命名为 "账号 {idx}"
         if not a.get("name"):
-            raise RuntimeError(f"Account #{idx} missing field: name")
+            a["name"] = f"账号 {idx}"
         # 支持整段 cookie 或分开的字段
         has_full_cookie = bool(a.get("cookie"))
         has_koa = bool(a.get("koa_sess") and a.get("koa_sess_sig"))
@@ -249,15 +250,17 @@ def main():
         msg_lower = str(msg).lower()
         is_repeat = any(k in msg_lower for k in ("repeat", "return tomorrow", "already", "logged"))
 
+        display_name = f"{name} ({st['email']})" if st.get('email') and st['email'] not in name else name
+
         if res.get("code") == 0:
             print(f"✅ 签到成功：{msg}，获得点数：{points_today}")
-            results.append((name, "成功", msg, points_today, st["leftDays"], st.get("traffic")))
+            results.append((display_name, "成功", msg, points_today, st["leftDays"], st.get("traffic")))
         elif is_repeat:
             print("ℹ️ 今日已签到：", msg)
-            results.append((name, "已签到", msg, points_today, st["leftDays"], st.get("traffic")))
+            results.append((display_name, "已签到", msg, points_today, st["leftDays"], st.get("traffic")))
         else:
             print("❌ 签到失败：", msg)
-            results.append((name, "失败", msg, points_today, st["leftDays"], st.get("traffic")))
+            results.append((display_name, "失败", msg, points_today, st["leftDays"], st.get("traffic")))
 
         time.sleep(2)
 

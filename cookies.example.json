@@ -1,7 +1,20 @@
 [
   {
-    "name": "主账号",
-    "koa_sess": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
-    "koa_sess_sig": "xxxxxxxxxxxxxxxxxxxxx"
+    "name": "账号1",
+    "gld_sess": "你的gld:sess",
+    "gld_sess_sig": "你的gld:sess.sig",
+    "koa_sess": "你的koa:sess",
+    "koa_sess_sig": "你的koa:sess.sig"
+  },
+  {
+    "name": "账号2",
+    "cookie": "也可直接粘贴整行浏览器Cookie字符串: gld:sess=...; gld:sess.sig=...; koa:sess=...; koa:sess.sig=..."
+  },
+  {
+    "name": "账号3 (支持任意多账号，name字段可选)",
+    "gld_sess": "...",
+    "gld_sess_sig": "...",
+    "koa_sess": "...",
+    "koa_sess_sig": "..."
   }
 ]
